@@ -63,14 +63,24 @@ document.addEventListener("DOMContentLoaded", function(e) {
         .text("Tweets Per Day");
 
     // Add bar chart
-    svg.selectAll("bar")
-        .data(data)
-      .enter().append("rect")
+    svg.selectAll("circle")
+  .data(data)
+  .enter().append("circle")
         .attr("class", "bar")
-        .attr("x", function(d) { return x(d.Date); })
-        .attr("width", x.rangeBand())
-        .attr("y", function(d) { return y(d.Count); })
-        .attr("height", function(d) { return height - y(d.Count); });
+        .attr("r", 2)
+        .attr("cx", function(d) { return x(d.Date); })
+        .attr("cy", function(d) { return y(d.Count); })
+        .attr("fill", "solid")
+        .attr("stroke", "blue");
+
+
+    // svg.selectAll("bar")
+    //     .data(data)
+    //   .enter()
+    //   .attr("x", function(d) { return x(d.Date); })
+    //     .attr("width", x.rangeBand())
+    //     .attr("y", function(d) { return y(d.Count); })
+    //     .attr("height", function(d) { return height - y(d.Count); });
 
   });
 });
