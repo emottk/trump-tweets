@@ -33,13 +33,16 @@ class TweetsController < ApplicationController
     end
   end
 
+
   def circle
     tweets = Tweet.all
     @results = [{year: '0'}]
     weeks = Array( Date.parse("2017-01-20")..Date.parse("2018-01-14") ).select(&:sunday?).map(&:to_s)
     weeks.each.with_index(1) do |d, i|
+      tweets_grouped = []
       tweet_count = Tweet.where(:date => Date.parse(d).beginning_of_week..Date.parse(d).end_of_day).size
-      @results[0]["Week #{i}"] = tweet_count
+      tweets_grouped.push(Tweet.where(:date => Date.parse(d).beginning_of_week..Date.parse(d).end_of_day))
+      @results[0]["Week #{i}"] = tweets_grouped
     end
     respond_to do |format|
       format.json {render json: @results}
