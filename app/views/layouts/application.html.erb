@@ -127,36 +127,59 @@
         return;
       }
 
+
       // structuring data
         // grab year values ie [0,1,2,3,4,5]
-        years = d3.set(raw.map(function(d){console.log(d[yearLabel]);})).values();
-        yearTarget = years[0];
+        // years = d3.set(raw.map(function(d){d[yearLabel];})).values();
+        // raw.map(function(d){console.log(d[yearLabel]);})
+        // console.log(years)
+        // yearTarget = years[0];
         // grab letters ie [A,B,C,D,E]
-        var parties = d3.keys(raw[0]).filter(function(d){return d !== yearLabel;});
-        var partDict = {};
+        var weeks = d3.keys(raw[0]).filter(function(d){return d !== yearLabel;});
+        var weeksDict = {};
         // iterate over x values to format an object. why?
-        parties.forEach(function(d,i){
-          partDict[d] = i;
+        weeks.forEach(function(d,i){
+          weeksDict[d] = i;
         });
+        // console.log(weeksDict)
         // iterate over values to make data object with key of year and value of party
         // {0: Array(7), 1: Array(7), 2: Array(7), 3: Array(7), 4: Array(7), 5: Array(7)}
         // array has 7 data points for that year eg {0: [2,150,0,144,48,410,803]}
-        var sums = {};
-        var data = {};
-        years.forEach(function(year){
-          data[year] = parties.map(function(party){
-            return +raw.filter( d => d[yearLabel] === year )
+        // var sums = {};
+        // var data = {};
+        // years.forEach(function(year){
+        //   data[year] = weeks.map(function(party){
+        //     return +raw.filter( d => d[yearLabel] === year )
+        //     party || 0;
+        //
+        //   });
+        //   // add all the values by year
+        //   // {0: 1557, 1: 1594, 2: 1584, 3: 1482, 4: 1627, 5: 1680}
+        //   // sums[year] = d3.sum(data[year]);
+        // });
 
-            [0][party] || 0;
-          });
-          // add all the values by year
-          // {0: 1557, 1: 1594, 2: 1584, 3: 1482, 4: 1627, 5: 1680}
-          sums[year] = d3.sum(data[year]);
-        });
 
-      // setting domain
+        var data = {}
+        var data_count = {}
+        weeks.forEach(function(d,i){
+          var negatives = []
+          var all = raw[0][d][0]
+          all.forEach(function(g){
+            if (g['negative'] = 'true'){
+              data_count[d] = negatives.push(g)
+              data[d] = negatives
+
+            }
+          })
+
+      })
+      console.log(data)
+
+        // setting domain
         // highest single data point ie 882
-        var max = d3.max(years.map(function(d){return d3.max(data[d]);}));
+        var max = d3.max(Object.values(data_count));
+
+        // console.log(years.map(function(d){console.log(data);}))
         // number of vertical rows/height of dots
         var nrow = 100//Math.ceil(dim.graphHeight/(2*(radius+mar)));
         // how wide should each bar be eg 15 dots
@@ -167,9 +190,9 @@
         yAxis.tickValues(d3.range(nrow).filter(function(d){return d%10===0;}));
         yAxis.tickFormat(function(d){return (d*barWidth);});
         // domain([0,1,2,3,4,5,6] sets the 6 columns
-        xScale.domain(parties.map(function(d,i){return i;}));
+        xScale.domain(weeks.map(function(d,i){return i;}));
         // display years "A" "B" "C"...
-        xAxis.tickFormat(function(d){return parties[d];});
+        xAxis.tickFormat(function(d){return weeks[d];});
           // not sure but if you remove you lose tickmarks and value of ticks
         xAxisObj.call(xAxis)
           .selectAll("text")
@@ -181,36 +204,53 @@
 
 
         xLocalScale.rangeBands([0,xScale.rangeBand()]).domain(d3.range(barWidth));
-        colorScale.domain(d3.range(parties.length));
+        colorScale.domain(d3.range(weeks.length));
 
-        inputScale.domain(years);
+        inputScale.domain(weeks);
 
 
-      var summax = d3.max(years.map(function(d){return sums[d];}));
+      // var summax = d3.max(years.map(function(d){return sums[d];}));
       // this one looks pretty important
-      var displaydata = d3.range(summax).map(function(d){return [];});
+      var displaydata = d3.range(weeks.length).map(function(d){return [];});
+      console.log(displaydata)
       var indexMargin = 0;
+      // console.log("INDEZ")
+      // console.log(indexMargin)
+      weeks.forEach(function(d,index){
+        console.log(index)
+        // if (indexMargin+index<52){
+        // console.log(d)
+        // for (var i=0;i<weeks.length;++i){
+        //   // console.log({label:d})
+          console.log(indexMargin+index+1)
+          // console.log((displaydata[indexMargin+index]))
+          // if (indexMargin+index<51){
 
-      parties.forEach(function(party,partyidx){
-        for (var i=0;i<data[years[0]][partyidx];++i){
-          displaydata[indexMargin+i].push({label:partyidx,idx:i});
-        }
-        indexMargin += data[years[0]][partyidx];
-      });
+          displaydata[indexMargin+index].push({label:d,idx:index+1});
 
-      for (var i=indexMargin;i<summax;++i){
-        displaydata[i].push({label:null,idx:null});
+        // }
+          // indexMargin += index;
+
+
+
       }
+      );
 
+      // console.log(displaydata)
+      // for (var i=indexMargin;i<max;++i){
+      //   displaydata[i].push({label:null,idx:null});
+      // }
+      //
+      // console.log(displaydata)
       // circles added to the dom
-      var votes = graphLayer.selectAll('.vote').data(displaydata).enter().append('circle')
-        .attr('class','vote')
+      var negatives = graphLayer.selectAll('.negative').data(displaydata).enter().append('circle')
+        .attr('class','negative')
         .attr('r',radius)
-        .attr('cx',function(d){return ((d[time].label!=null)?(xScale(d[time].label)+xLocalScale(d[time].idx%barWidth)+radius+mar):(dim.graphWidth/2));})
-        .attr('cy',function(d){return ((d[time].label!=null)?(yScale(Math.floor((d[time].idx+0.1)/barWidth))-radius-mar):0);})
-        .style('opacity',function(d){return (d[time].label!=null)?0.8:0.0;})
+        .attr('cx',function(d){return ((d[label]!=null)?(xScale(d[label])+xLocalScale(d[idx]%barWidth)+radius+mar):(dim.graphWidth/2));})
+        .attr('cy',function(d){return ((d[label]!=null)?(yScale(Math.floor((data[d[label]].length+0.1)/barWidth))-radius-mar):0);})
+        .style('opacity',function(d){return (d[label]!=null)?0.8:0.0;})
         .style('fill','steelblue');  // black dots without this
-    }); // end load the data
+        }); // end load the data
 
       // trying to make svg responsive
       // var aspect = dim.width / dim.height,
