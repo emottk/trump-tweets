@@ -5,8 +5,8 @@ class TweetsController < ApplicationController
       if bad_tweet = Tweet.daily_worst
         @worst = bad_tweet.content
       end
-    else
-      render 'no-tweets'
+    # else
+    #   render 'no-tweets'
     end
   end
 

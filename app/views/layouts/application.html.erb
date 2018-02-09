@@ -136,11 +136,14 @@
         // yearTarget = years[0];
         // grab letters ie [A,B,C,D,E]
         var weeks = d3.keys(raw[0]).filter(function(d){return d !== yearLabel;});
+        console.log(weeks)
         var weeksDict = {};
         // iterate over x values to format an object. why?
         weeks.forEach(function(d,i){
           weeksDict[d] = i;
         });
+
+        console.log(weeksDict)
         // console.log(weeksDict)
         // iterate over values to make data object with key of year and value of party
         // {0: Array(7), 1: Array(7), 2: Array(7), 3: Array(7), 4: Array(7), 5: Array(7)}
@@ -212,29 +215,24 @@
       // var summax = d3.max(years.map(function(d){return sums[d];}));
       // this one looks pretty important
       var displaydata = d3.range(weeks.length).map(function(d){return [];});
-      console.log(displaydata)
       var indexMargin = 0;
       // console.log("INDEZ")
       // console.log(indexMargin)
-      weeks.forEach(function(d,index){
-        console.log(index)
+      Object.keys(data).forEach(function(d,index){
         // if (indexMargin+index<52){
         // console.log(d)
         // for (var i=0;i<weeks.length;++i){
         //   // console.log({label:d})
-          console.log(indexMargin+index+1)
           // console.log((displaydata[indexMargin+index]))
           // if (indexMargin+index<51){
-
-          displaydata[indexMargin+index].push({label:d,idx:index+1});
+          count = Object.keys(data[d]).length
+          displaydata[indexMargin+index].push({label:d,idx:index+1,count:count});
 
         // }
           // indexMargin += index;
-
-
-
       }
       );
+      console.log(displaydata)
 
       // console.log(displaydata)
       // for (var i=indexMargin;i<max;++i){
@@ -247,7 +245,7 @@
         .attr('class','negative')
         .attr('r',radius)
         .attr('cx',function(d){return ((d[label]!=null)?(xScale(d[label])+xLocalScale(d[idx]%barWidth)+radius+mar):(dim.graphWidth/2));})
-        .attr('cy',function(d){return ((d[label]!=null)?(yScale(Math.floor((data[d[label]].length+0.1)/barWidth))-radius-mar):0);})
+        .attr('cy',function(d){return ((d[label]!=null)?(yScale(Math.floor((d[count].length+0.1)/barWidth))-radius-mar):0);})
         .style('opacity',function(d){return (d[label]!=null)?0.8:0.0;})
         .style('fill','steelblue');  // black dots without this
         }); // end load the data
